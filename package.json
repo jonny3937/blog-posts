@@ -3,11 +3,15 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-  "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
-  "build": "tsc",
-  "start": "node dist/server.js"
-}
-,
+    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+    "build": "tsc",
+    "start": "cd server && npx ts-node src/server.ts",
+    "start:prod": "node dist/index.js",
+    "clean": "rimraf dist",
+    "prebuild": "npm run clean",
+    "prod": "npm run build && npm start",
+    "setup": "npm install && cd server && npm install && npx prisma generate && npx prisma migrate dev"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -22,9 +26,12 @@
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
+    "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^24.0.10",
+    "rimraf": "^5.0.5",
+    "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.8.3"
   },

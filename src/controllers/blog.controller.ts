@@ -1,5 +1,5 @@
-import { Request, Response } from 'express';
-import { prisma } from '../utils/prisma';
+import { Request, Response } from "express";
+import { prisma } from "../config";
 
 export const createBlog = async (req: Request, res: Response) => {
   try {
@@ -18,71 +18,70 @@ export const createBlog = async (req: Request, res: Response) => {
 
     res.status(201).json(blog);
   } catch (err) {
-    res.status(500).json({ error: 'Failed to create blog' });
+    res.status(500).json({ error: "Failed to create blog" });
   }
 };
 
 export const getAllBlogs = async (req: Request, res: Response) => {
   try {
     const blogs = await prisma.blog.findMany({
-      where: { isDeleted: false },
       include: {
         author: {
-          select: { id: true, username: true, profilePic: true },
+          select: { id: true, username: true, firstName: true, lastName: true },
         },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
 
     res.json(blogs);
   } catch (err) {
-    res.status(500).json({ error: 'Failed to fetch blogs' });
+    res.status(500).json({ error: "Failed to fetch blogs" });
   }
 };
 
 export const getBlogById = async (req: Request, res: Response) => {
   try {
     const blog = await prisma.blog.findUnique({
-      where: { id: req.params.id },
+      where: { id: parseInt(req.params.id) },
       include: {
         author: {
-          select: { id: true, username: true, profilePic: true },
+          select: { id: true, username: true, firstName: true, lastName: true },
         },
       },
     });
 
-    if (!blog || blog.isDeleted) {
-      return res.status(404).json({ error: 'Blog not found' });
+    if (!blog) {
+      res.status(404).json({ error: "Blog not found" });
+      return;
     }
 
     res.json(blog);
   } catch (err) {
-    res.status(500).json({ error: 'Failed to fetch blog' });
+    res.status(500).json({ error: "Failed to fetch blog" });
   }
 };
 
 export const updateBlog = async (req: Request, res: Response) => {
   try {
     const blog = await prisma.blog.update({
-      where: { id: req.params.id },
+      where: { id: parseInt(req.params.id) },
       data: req.body,
     });
 
     res.json(blog);
   } catch (err) {
-    res.status(500).json({ error: 'Failed to update blog' });
+    res.status(500).json({ error: "Failed to update blog" });
   }
 };
 
 export const deleteBlog = async (req: Request, res: Response) => {
   try {
-    await prisma.blog.update({
-      where: { id: req.params.id },
-      data: { isDeleted: true },
+    await prisma.blog.delete({
+      where: { id: parseInt(req.params.id) },
     });
 
-    res.json({ message: 'Blog deleted successfully' });
+    res.json({ message: "Blog deleted successfully" });
   } catch (err) {
-    res.status(500).json({ error: 'Failed to delete blog' });
+    res.status(500).json({ error: "Failed to delete blog" });
   }
 };
